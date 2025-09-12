@@ -1,114 +1,109 @@
-# Solana Message Board
+# Tunnel
 
-A simple Solana program built with Anchor that allows users to post messages on a decentralized message board.
+A decentralized message board built on Solana blockchain with a beautiful glassmorphism UI.
+
+## What is Tunnel?
+
+Tunnel is your private space cut out from the real world - a decentralized message board where you can post and read messages stored permanently on the Solana blockchain.
 
 ## Features
 
-- ✅ Post messages with content validation
-- ✅ Author tracking for each message
-- ✅ Account initialization with proper space allocation
-- ✅ Error handling for content length limits
-- ✅ Integration with Solana System Program
+- **Decentralized**: Messages stored on Solana blockchain
+- **Glassmorphism UI**: Beautiful frosted glass design
+- **Wallet Integration**: Connect with Phantom/Solflare wallets
+- **Real-time**: Live message posting and fetching
+- **Responsive**: Works on desktop and mobile
 
-## Program Structure
+## Tech Stack
 
-### Smart Contract (Rust/Anchor)
-- **File**: `programs/solana-message-board/src/lib.rs`
-- **Program ID**: `AEtjhvM2nkjjrvQF1K2xcPV9mERpbjqrZEvgKavmbuaR`
+**Backend (Solana Program)**
+- Rust + Anchor framework
+- Program ID: `CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj`
+- Features: Message posting with timestamps, content validation (280 char limit)
 
-### Key Components
+**Frontend**
+- React 18 + TypeScript
+- Vite + Tailwind CSS
+- Wallet adapters for Solana
+- Framer Motion animations
 
-#### MessageAccount Struct
-```rust
-#[account]
-pub struct MessageAccount {
-    pub author: Pubkey,
-    pub content: String,
-}
-```
+## Quick Start
 
-#### post_message Instruction
-```rust
-pub fn post_message(ctx: Context<PostMessage>, content: String) -> Result<()> {
-    require!(content.len() <= MAX_CONTENT_LENGTH, MessageError::ContentTooLong);
-    
-    let message_account = &mut ctx.accounts.message;
-    message_account.author = ctx.accounts.author.key();
-    message_account.content = content;
-    
-    Ok(())
-}
-```
+### Prerequisites
+- Node.js 18+
+- Solana CLI
+- Anchor CLI
 
-## Prerequisites
+### Installation
 
-- Rust (latest stable)
-- Solana CLI (v1.18.23)
-- Anchor CLI (v0.31.1)
-- Node.js and npm
-- Java 21 (for yarn compatibility)
-
-## Installation
-
-1. Clone the repository:
 ```bash
-git clone <your-repo-url>
+# Clone and install
+git clone <your-repo>
 cd solana-message-board
-```
-
-2. Install dependencies:
-```bash
 npm install
+
+# Build Solana program
+anchor build
+
+# Start frontend
+cd frontend
+npm install
+npm run dev
 ```
 
-3. Build the program:
+### Environment Variables
+
+Create `frontend/.env`:
+```env
+VITE_PROGRAM_ID=CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj
+VITE_NETWORK=devnet
+VITE_RPC_URL=https://api.devnet.solana.com
+```
+
+### Deployment
+
+**Vercel (Frontend)**
+1. Set environment variables in Vercel dashboard
+2. Deploy automatically on push
+
+**Solana (Program)**
 ```bash
-anchor build
+anchor deploy --provider.cluster devnet
 ```
 
 ## Usage
 
-### Running Tests
+1. Connect your Solana wallet (Phantom/Solflare)
+2. Post messages (280 character limit)
+3. View all messages in chronological order
+4. Messages are stored permanently on blockchain
+
+## Project Structure
+
+```
+├── programs/solana-message-board/    # Solana smart contract
+├── frontend/                         # React frontend
+│   ├── src/
+│   │   ├── components/              # UI components
+│   │   ├── services/               # Blockchain integration
+│   │   └── pages/                  # App pages
+└── tests/                          # Program tests
+```
+
+## Commands
+
 ```bash
-anchor test
+# Program
+anchor build          # Build program
+anchor test           # Run tests
+anchor deploy         # Deploy to cluster
+
+# Frontend
+npm run dev          # Development server
+npm run build        # Production build
+npm run preview      # Preview build
 ```
-
-### Deploying to Localnet
-```bash
-# Start local validator
-solana-test-validator
-
-# Deploy program
-anchor deploy
-```
-
-## Development
-
-### Project Structure
-```
-solana-message-board/
-├── Anchor.toml              # Anchor configuration
-├── Cargo.toml              # Rust workspace config
-├── package.json            # Node.js dependencies
-├── programs/
-│   └── solana-message-board/
-│       ├── Cargo.toml      # Program dependencies
-│       ├── src/
-│       │   └── lib.rs      # Main program code
-│       └── Xargo.toml      # SBPF target config
-├── tests/
-│   └── solana-message-board.js  # Test suite
-└── migrations/
-    └── deploy.js           # Deployment script
-```
-
-### Available Commands
-
-- `anchor build` - Build the program
-- `anchor test` - Run tests
-- `anchor deploy` - Deploy to configured cluster
-- `anchor build --verifiable` - Build with Docker for verification
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License
