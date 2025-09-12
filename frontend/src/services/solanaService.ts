@@ -173,7 +173,16 @@ export class SolanaService {
           
           // Check if it's a valid positive number
           if (typeof timestampValue === 'number' && timestampValue > 0) {
-            timestamp = timestampValue * 1000; // Convert Unix timestamp to milliseconds
+            // Check if timestamp is already in milliseconds (larger than year 2000 in ms)
+            // Unix timestamp in seconds for year 2000: 946684800
+            // Unix timestamp in milliseconds for year 2000: 946684800000
+            if (timestampValue > 946684800000) {
+              // Already in milliseconds
+              timestamp = timestampValue;
+            } else {
+              // In seconds, convert to milliseconds
+              timestamp = timestampValue * 1000;
+            }
           }
         }
         

@@ -93,10 +93,9 @@ export const MessageForm: React.FC = () => {
         console.warn('Failed to parse result, using fallback timestamp:', error);
       }
 
-      // For new messages, the timestamp will be stored on-chain
-      // We'll get the real timestamp when we fetch messages
-      // For now, use current time as placeholder
-      timestamp = Date.now();
+      // The timestamp is now stored on-chain in the message account
+      // We'll get the real timestamp when we fetch messages from blockchain
+      // Don't override with local time - let the blockchain timestamp be authoritative
 
       // Add message to local store (timestamp will be updated when we fetch from blockchain)
       addMessage({
