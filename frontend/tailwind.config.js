@@ -9,19 +9,15 @@ export default {
       colors: {
         primary: {
           red: '#E43636',
-          'red-rgb': 'rgb(228,54,54)',
         },
         cream: {
           light: '#F6EFD2',
-          'light-rgb': 'rgb(246,239,210)',
         },
         beige: {
           soft: '#E2DDB4',
-          'soft-rgb': 'rgb(226,221,180)',
         },
         black: {
           pure: '#000000',
-          'pure-rgb': 'rgb(0,0,0)',
         },
         glass: {
           white: 'rgba(255, 255, 255, 0.1)',

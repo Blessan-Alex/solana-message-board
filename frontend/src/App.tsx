@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WalletContextProvider } from '@/components/wallet/WalletProvider';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LandingPage } from '@/pages/LandingPage';
 import { MessageBoard } from '@/pages/MessageBoard';
 import './App.css';
@@ -16,15 +17,17 @@ function App() {
   };
 
   return (
-    <WalletContextProvider>
-      <div className="App">
-        {currentPage === 'landing' ? (
-          <LandingPage onEnterApp={handleEnterApp} />
-        ) : (
-          <MessageBoard onBackToLanding={handleBackToLanding} />
-        )}
-      </div>
-    </WalletContextProvider>
+    <ErrorBoundary>
+      <WalletContextProvider>
+        <div className="App">
+          {currentPage === 'landing' ? (
+            <LandingPage onEnterApp={handleEnterApp} />
+          ) : (
+            <MessageBoard onBackToLanding={handleBackToLanding} />
+          )}
+        </div>
+      </WalletContextProvider>
+    </ErrorBoundary>
   );
 }
 

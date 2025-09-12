@@ -3,6 +3,7 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
+import { config } from '@/config/env';
 
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -12,8 +13,8 @@ interface WalletContextProviderProps {
 }
 
 export const WalletContextProvider: React.FC<WalletContextProviderProps> = ({ children }) => {
-  // Use devnet for testing
-  const endpoint = useMemo(() => 'https://api.devnet.solana.com', []);
+  // Use configured RPC endpoint
+  const endpoint = useMemo(() => config.rpcUrl, []);
 
   // Create wallet adapters - Phantom is now a Standard Wallet so we don't need the adapter
   const wallets = useMemo(

@@ -7,10 +7,11 @@ import {
 } from '@solana/web3.js';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { SolanaConfig, Message, PostMessageParams } from '@/types';
+import { config, defaultSolanaConfig, fallbackSolanaConfig } from '@/config/env';
 
 // Import the actual generated IDL from Anchor
 const IDL = {
-  "address": "CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj",
+  "address": config.programId,
   "metadata": {
     "name": "solana_message_board",
     "version": "0.1.0",
@@ -126,8 +127,8 @@ export class SolanaService {
     try {
       this.programId = new PublicKey(config.programId);
       
-      // Use localnet RPC URL
-      const rpcUrl = config.rpcUrl || 'http://127.0.0.1:8899';
+      // Use configured RPC URL
+      const rpcUrl = config.rpcUrl;
       this.connection = new Connection(rpcUrl, 'confirmed');
       
       // Test connection with timeout
@@ -340,17 +341,5 @@ export class SolanaService {
   }
 }
 
-// Update both configs with the new program ID
-export const defaultSolanaConfig: SolanaConfig = {
-  network: 'localnet',
-  programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj',
-  rpcUrl: 'http://127.0.0.1:8899',
-};
-
-export const fallbackSolanaConfig: SolanaConfig = {
-  network: 'devnet',
-  programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj',
-  rpcUrl: 'https://api.devnet.solana.com',
-};
-
-export const solanaService = new SolanaService(fallbackSolanaConfig);
+// Export the service instance using the current configuration
+export const solanaService = new SolanaService(defaultSolanaConfig);
