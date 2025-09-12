@@ -9,7 +9,7 @@ import { SolanaConfig, Message, PostMessageParams } from '@/types';
 import { defaultSolanaConfig, fallbackSolanaConfig } from '@/config/env';
 
 // Import the actual generated IDL from Anchor
-import IDL from '../../../target/idl/solana_message_board.json';
+import IDL from '../../../../target/idl/solana_message_board.json';
 
 export class SolanaService {
   private connection!: Connection;
