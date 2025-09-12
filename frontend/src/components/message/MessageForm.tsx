@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
 import { Send, AlertCircle } from 'lucide-react';
@@ -23,7 +23,7 @@ export const MessageForm: React.FC = () => {
     const currentState = { 
       connected, 
       publicKey: publicKey?.toString(), 
-      wallet: wallet?.adapter?.name 
+      wallet: wallet?.adapter?.name || 'Unknown'
     };
     
     const prevState = prevWalletState.current;

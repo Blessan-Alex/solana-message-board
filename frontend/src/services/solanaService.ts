@@ -28,6 +28,9 @@ export class SolanaService {
       
       // Use configured RPC URL
       const rpcUrl = config.rpcUrl || 'https://api.devnet.solana.com';
+      if (!rpcUrl) {
+        throw new Error('RPC URL is required');
+      }
       this.connection = new Connection(rpcUrl, 'confirmed');
       
       // Test connection with timeout
@@ -119,7 +122,8 @@ export class SolanaService {
       });
 
       // Wait for confirmation
-      await this.connection.confirmTransaction(signature, 'confirmed');
+      const confirmation = await this.connection.confirmTransaction(signature, 'confirmed');
+      console.log('Transaction confirmed:', confirmation);
       
       // The timestamp is now stored on-chain in the message account
       // We'll get it when we fetch messages, so use current time as fallback

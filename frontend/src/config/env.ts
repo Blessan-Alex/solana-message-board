@@ -22,9 +22,9 @@ const defaultConfig: AppConfig = {
  */
 export function getConfig(): AppConfig {
   // Try to get environment from Vite environment variables
-  const envNetwork = import.meta.env.VITE_NETWORK as string;
-  const envProgramId = import.meta.env.VITE_PROGRAM_ID as string;
-  const envRpcUrl = import.meta.env.VITE_RPC_URL as string;
+  const envNetwork = (import.meta as any).env?.VITE_NETWORK as string;
+  const envProgramId = (import.meta as any).env?.VITE_PROGRAM_ID as string;
+  const envRpcUrl = (import.meta as any).env?.VITE_RPC_URL as string;
 
   // Validate required environment variables
   if (!envProgramId) {
