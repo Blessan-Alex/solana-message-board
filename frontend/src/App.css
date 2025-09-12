@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(153, 69, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(153, 69, 255, 0.8);
+  }
+}
+
+/* Glassmorphism utilities */
+.glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Wallet adapter overrides */
+.wallet-adapter-button {
+  background: rgb(228, 54, 54) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgb(228, 54, 54) !important;
+  border-radius: 12px !important;
+  color: rgb(246, 239, 210) !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.wallet-adapter-button:hover {
+  background: rgba(228, 54, 54, 0.8) !important;
+  border-color: rgba(228, 54, 54, 0.8) !important;
+  transform: scale(1.05) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  backdrop-filter: blur(8px) !important;
+}
+
+.wallet-adapter-modal {
+  background: rgba(246, 239, 210, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(228, 54, 54, 0.2) !important;
+  border-radius: 16px !important;
+}
+
+.wallet-adapter-modal-list {
+  background: transparent !important;
+}
+
+.wallet-adapter-modal-list-item {
+  background: rgba(228, 54, 54, 0.05) !important;
+  border: 1px solid rgba(228, 54, 54, 0.1) !important;
+  border-radius: 12px !important;
+  margin-bottom: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.wallet-adapter-modal-list-item:hover {
+  background: rgba(228, 54, 54, 0.1) !important;
+  border-color: rgba(228, 54, 54, 0.2) !important;
+  transform: scale(1.02) !important;
+}
+
+/* Loading animations */
+.loading-dots {
+  display: inline-block;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+
+/* Chat-specific styles */
+.chat-message-bubble {
+  max-width: 70%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.chat-message-bubble p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.chat-input {
+  resize: none;
+  overflow: hidden;
+}
+
+.chat-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(228, 54, 54, 0.2);
+}
+
+/* Scrollbar styling for chat */
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: rgba(228, 54, 54, 0.1);
+  border-radius: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(228, 54, 54, 0.3);
+  border-radius: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(228, 54, 54, 0.5);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .chat-message-bubble {
+    max-width: 85%;
+  }
+
+  .chat-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .chat-input-container {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-message-bubble {
+    max-width: 90%;
+  }
+  
+  .chat-header h1 {
+    font-size: 1.125rem;
+  }
+  
+  .chat-header p {
+    font-size: 0.75rem;
+  }
+}

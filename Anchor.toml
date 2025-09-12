@@ -8,11 +8,14 @@ skip-lint = false
 [programs.localnet]
 solana_message_board = "AEtjhvM2nkjjrvQF1K2xcPV9mERpbjqrZEvgKavmbuaR"
 
+[programs.devnet]
+solana_message_board = "CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj"
+
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
