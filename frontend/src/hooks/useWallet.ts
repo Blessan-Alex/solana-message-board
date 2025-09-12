@@ -1,26 +1,6 @@
 import { useWallet as useSolanaWallet } from '@solana/wallet-adapter-react';
-import { useWalletStore } from '@/stores/walletStore';
-import { useEffect } from 'react';
 
+// Simple wrapper around Solana wallet adapter - no redundant state management
 export const useWallet = () => {
-  const solanaWallet = useSolanaWallet();
-  const { setConnected, setPublicKey, setConnecting, setDisconnecting } = useWalletStore();
-
-  useEffect(() => {
-    setConnected(solanaWallet.connected);
-    setPublicKey(solanaWallet.publicKey);
-    setConnecting(solanaWallet.connecting);
-    setDisconnecting(solanaWallet.disconnecting);
-  }, [
-    solanaWallet.connected,
-    solanaWallet.publicKey,
-    solanaWallet.connecting,
-    solanaWallet.disconnecting,
-    setConnected,
-    setPublicKey,
-    setConnecting,
-    setDisconnecting,
-  ]);
-
-  return solanaWallet;
+  return useSolanaWallet();
 };

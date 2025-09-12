@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Clock, User } from 'lucide-react';
@@ -15,19 +15,21 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
   const { publicKey } = useWallet();
   const isOwnMessage = publicKey && message.author.equals(publicKey);
   
-  // Generate consistent avatar color based on author public key
-  const avatarColors = [
-    'from-primary-red to-cream-light',
-    'from-cream-light to-beige-soft',
-    'from-beige-soft to-primary-red',
-    'from-primary-red/80 to-beige-soft/80',
-    'from-cream-light/80 to-primary-red/80'
-  ];
-  const avatarIndex = parseInt(message.author.toString().slice(-1), 16) % avatarColors.length;
-  const avatarColor = avatarColors[avatarIndex];
-  
-  // Generate initials from public key
-  const initials = message.author.toString().slice(0, 2).toUpperCase();
+  // Memoize avatar generation to prevent recalculation on every render
+  const { avatarColor, initials } = useMemo(() => {
+    const avatarColors = [
+      'from-primary-red to-cream-light',
+      'from-cream-light to-beige-soft',
+      'from-beige-soft to-primary-red',
+      'from-primary-red/80 to-beige-soft/80',
+      'from-cream-light/80 to-primary-red/80'
+    ];
+    const avatarIndex = parseInt(message.author.toString().slice(-1), 16) % avatarColors.length;
+    const avatarColor = avatarColors[avatarIndex];
+    const initials = message.author.toString().slice(0, 2).toUpperCase();
+    
+    return { avatarColor, initials };
+  }, [message.author]);
 
   return (
     <motion.div

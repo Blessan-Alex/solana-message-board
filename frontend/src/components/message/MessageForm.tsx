@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
 import { Send, AlertCircle } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { validateMessage } from '@/utils';
@@ -50,7 +51,10 @@ export const MessageForm: React.FC = () => {
       return;
     }
 
-    const validation = validateMessage(content);
+    // Sanitize input to prevent XSS attacks
+    const sanitizedContent = DOMPurify.sanitize(content.trim());
+    
+    const validation = validateMessage(sanitizedContent);
     if (!validation.valid) {
       setError(validation.error || 'Invalid message');
       return;
@@ -68,7 +72,7 @@ export const MessageForm: React.FC = () => {
 
       // Use the wallet adapter's signTransaction method if available, otherwise use Standard Wallet API
       const result = await solanaService.postMessage(
-        { content, author: publicKey },
+        { content: sanitizedContent, author: publicKey },
         wallet, // Pass the actual wallet adapter
         publicKey // Pass the publicKey separately
       );
@@ -97,7 +101,7 @@ export const MessageForm: React.FC = () => {
       // Add message to local store (timestamp will be updated when we fetch from blockchain)
       addMessage({
         author: publicKey,
-        content,
+        content: sanitizedContent,
         timestamp: timestamp,
       });
 

@@ -69,16 +69,17 @@ export function validateMessage(content: string): { valid: boolean; error?: stri
   return { valid: true };
 }
 
+// Cache gradients to prevent creating new arrays on each call
+const GRADIENTS = [
+  'from-purple-400 via-pink-500 to-red-500',
+  'from-blue-400 via-purple-500 to-pink-500',
+  'from-green-400 via-blue-500 to-purple-500',
+  'from-yellow-400 via-red-500 to-pink-500',
+  'from-indigo-400 via-purple-500 to-pink-500',
+];
+
 export function generateGradient(): string {
-  const gradients = [
-    'from-purple-400 via-pink-500 to-red-500',
-    'from-blue-400 via-purple-500 to-pink-500',
-    'from-green-400 via-blue-500 to-purple-500',
-    'from-yellow-400 via-red-500 to-pink-500',
-    'from-indigo-400 via-purple-500 to-pink-500',
-  ];
-  
-  return gradients[Math.floor(Math.random() * gradients.length)];
+  return GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
 }
 
 export function debounce<T extends (...args: any[]) => any>(

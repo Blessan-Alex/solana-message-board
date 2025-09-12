@@ -9,30 +9,11 @@ export interface AppConfig {
   rpcUrl: string;
 }
 
-// Default configuration (fallback values)
+// Default configuration (fallback values) - these should be overridden by environment variables
 const defaultConfig: AppConfig = {
   network: 'devnet',
-  programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj',
+  programId: '', // Must be set via environment variable
   rpcUrl: 'https://api.devnet.solana.com',
-};
-
-// Environment-specific configurations
-const configs: Record<string, AppConfig> = {
-  localnet: {
-    network: 'localnet',
-    programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj',
-    rpcUrl: 'http://127.0.0.1:8899',
-  },
-  devnet: {
-    network: 'devnet',
-    programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj',
-    rpcUrl: 'https://api.devnet.solana.com',
-  },
-  'mainnet-beta': {
-    network: 'mainnet-beta',
-    programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj',
-    rpcUrl: 'https://api.mainnet-beta.solana.com',
-  },
 };
 
 /**
@@ -45,6 +26,13 @@ export function getConfig(): AppConfig {
   const envProgramId = import.meta.env.VITE_PROGRAM_ID as string;
   const envRpcUrl = import.meta.env.VITE_RPC_URL as string;
 
+  // Validate required environment variables
+  if (!envProgramId) {
+    throw new Error(
+      'VITE_PROGRAM_ID environment variable is required. Please create a .env file with your program ID.'
+    );
+  }
+
   // If environment variables are available, use them
   if (envNetwork && envProgramId && envRpcUrl) {
     return {
@@ -54,13 +42,12 @@ export function getConfig(): AppConfig {
     };
   }
 
-  // Otherwise, try to detect environment from URL or use default
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return configs.localnet;
-  }
-
-  return defaultConfig;
+  // Fallback to default with environment program ID
+  return {
+    ...defaultConfig,
+    programId: envProgramId || '',
+    rpcUrl: envRpcUrl || defaultConfig.rpcUrl,
+  };
 }
 
 // Export the current configuration
@@ -75,6 +62,6 @@ export const defaultSolanaConfig = {
 
 export const fallbackSolanaConfig = {
   network: 'devnet' as const,
-  programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj',
+  programId: '', // Must be set via environment variable
   rpcUrl: 'https://api.devnet.solana.com',
 };
