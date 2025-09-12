@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { WalletContextProvider } from '@/components/wallet/WalletProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LandingPage } from '@/pages/LandingPage';

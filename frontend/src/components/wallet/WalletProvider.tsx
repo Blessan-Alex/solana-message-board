@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
 import { config } from '@/config/env';
 
 // Import wallet adapter CSS

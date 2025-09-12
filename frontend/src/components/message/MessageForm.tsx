@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
-import { Send, AlertCircle, MessageSquare } from 'lucide-react';
+import { Send, AlertCircle } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { validateMessage } from '@/utils';
@@ -9,7 +9,7 @@ import { useMessagesStore } from '@/stores/messagesStore';
 import { solanaService } from '@/services/solanaService';
 
 export const MessageForm: React.FC = () => {
-  const { connected, publicKey, signTransaction, wallet } = useWallet();
+  const { connected, publicKey, wallet } = useWallet();
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export const MessageForm: React.FC = () => {
     const currentState = { 
       connected, 
       publicKey: publicKey?.toString(), 
-      wallet: wallet?.name 
+      wallet: wallet?.adapter?.name 
     };
     
     const prevState = prevWalletState.current;
@@ -63,7 +63,7 @@ export const MessageForm: React.FC = () => {
       console.log('Starting message post with wallet:', {
         connected,
         publicKey: publicKey?.toString(),
-        walletName: wallet?.name || 'Standard Wallet'
+        walletName: wallet?.adapter?.name || 'Standard Wallet'
       });
 
       // Use the wallet adapter's signTransaction method if available, otherwise use Standard Wallet API
@@ -81,13 +81,20 @@ export const MessageForm: React.FC = () => {
         const parsedResult = JSON.parse(result);
         signature = parsedResult.signature;
         timestamp = parsedResult.timestamp;
-      } catch {
+        console.log('✅ Message posted with signature:', signature);
+      } catch (error) {
         // Fallback for old format (just signature)
         signature = result;
         timestamp = Date.now();
+        console.warn('Failed to parse result, using fallback timestamp:', error);
       }
 
-      // Add message to local store with real timestamp
+      // For new messages, the timestamp will be stored on-chain
+      // We'll get the real timestamp when we fetch messages
+      // For now, use current time as placeholder
+      timestamp = Date.now();
+
+      // Add message to local store (timestamp will be updated when we fetch from blockchain)
       addMessage({
         author: publicKey,
         content,
@@ -95,7 +102,7 @@ export const MessageForm: React.FC = () => {
       });
 
       setContent('');
-      console.log('Message posted successfully:', signature, 'at timestamp:', timestamp);
+      console.log('✅ Message posted successfully! Timestamp will be updated from blockchain on next refresh.');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to post message';
       setError(errorMessage);

@@ -2,8 +2,7 @@ import {
   Connection, 
   PublicKey, 
   Keypair,
-  SystemProgram,
-  sendAndConfirmTransaction
+  SystemProgram
 } from '@solana/web3.js';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { SolanaConfig, Message, PostMessageParams } from '@/types';
@@ -117,18 +116,18 @@ export class SolanaService {
   private program: Program | null = null;
   private programId!: PublicKey;
   private isInitialized = false;
-  private _lastReadyState: boolean | null = null;
 
   constructor(config: SolanaConfig) {
     this.initializeService(config);
   }
+
 
   private async initializeService(config: SolanaConfig) {
     try {
       this.programId = new PublicKey(config.programId);
       
       // Use configured RPC URL
-      const rpcUrl = config.rpcUrl;
+      const rpcUrl = config.rpcUrl || 'https://api.devnet.solana.com';
       this.connection = new Connection(rpcUrl, 'confirmed');
       
       // Test connection with timeout
@@ -219,18 +218,18 @@ export class SolanaService {
         preflightCommitment: 'confirmed',
       });
 
-      // Wait for confirmation and get the transaction details
-      const confirmation = await this.connection.confirmTransaction(signature, 'confirmed');
+      // Wait for confirmation
+      await this.connection.confirmTransaction(signature, 'confirmed');
       
-      // Get the transaction details to extract the block time
-      const transaction = await this.connection.getTransaction(signature, {
-        commitment: 'confirmed'
-      });
+      // The timestamp is now stored on-chain in the message account
+      // We'll get it when we fetch messages, so use current time as fallback
+      const timestamp = Date.now();
+      console.log('Message posted successfully - timestamp stored on-chain');
       
       // Return both signature and timestamp for the frontend to use
       return JSON.stringify({
         signature,
-        timestamp: transaction?.blockTime ? transaction.blockTime * 1000 : Date.now()
+        timestamp: timestamp
       });
     } catch (error) {
       console.error('Error posting message:', error);
@@ -249,51 +248,46 @@ export class SolanaService {
       }
     }
 
+    console.log('🔄 Fetching messages from updated program with on-chain timestamps...');
+
     try {
       // Fetch all message accounts using the correct account name from the IDL
       const accounts = await (this.program.account as any).messageAccount.all() as any[];
       
-      // Get transaction signatures for each account to determine creation time
-      const messagesWithTimestamps = await Promise.all(
-        accounts.map(async (account: any) => {
-          try {
-            // Get the account's creation transaction to determine when it was created
-            const signatures = await this.connection.getSignaturesForAddress(account.publicKey, {
-              limit: 1
-            });
-            
-            let timestamp = Date.now(); // Fallback to current time
-            
-            if (signatures.length > 0) {
-              // Get the transaction details to get the block time
-              const transaction = await this.connection.getTransaction(signatures[0].signature, {
-                commitment: 'confirmed'
-              });
-              
-              if (transaction && transaction.blockTime) {
-                // Convert block time (Unix timestamp) to milliseconds
-                timestamp = transaction.blockTime * 1000;
-              }
-            }
-            
-            return {
-              author: account.account.author,
-              content: account.account.content,
-              accountAddress: account.publicKey,
-              timestamp: timestamp,
-            };
-          } catch (error) {
-            console.warn(`Failed to get timestamp for account ${account.publicKey.toString()}:`, error);
-            // Fallback to current time if we can't get the real timestamp
-            return {
-              author: account.account.author,
-              content: account.account.content,
-              accountAddress: account.publicKey,
-              timestamp: Date.now(),
-            };
-          }
-        })
-      );
+      // Read timestamps directly from the on-chain account data
+      // Handle both old messages (without timestamp) and new messages (with timestamp)
+      const messagesWithTimestamps = accounts.map((account: any, index: number) => {
+        let timestamp: number;
+        
+        if (account.account.timestamp && account.account.timestamp > 0) {
+          // New messages: timestamp stored on-chain
+          timestamp = account.account.timestamp * 1000; // Convert Unix timestamp to milliseconds
+          console.log(`✅ New message with on-chain timestamp:`, {
+            account: account.publicKey.toString(),
+            onChainTimestamp: account.account.timestamp,
+            formatted: new Date(timestamp).toLocaleString()
+          });
+        } else {
+          // Old messages: use relative timing based on account order
+          const baseTime = Date.now();
+          timestamp = baseTime - (index * 2000); // Each old message is 2 seconds older
+          console.log(`⚠️ Old message with zero timestamp, using fallback:`, {
+            account: account.publicKey.toString(),
+            onChainTimestamp: account.account.timestamp,
+            fallbackTimestamp: timestamp,
+            formatted: new Date(timestamp).toLocaleString()
+          });
+        }
+        
+        const messageData = {
+          author: account.account.author,
+          content: account.account.content,
+          accountAddress: account.publicKey,
+          timestamp: timestamp,
+        };
+        
+        return messageData;
+      });
       
       // Sort messages by timestamp (newest first)
       return messagesWithTimestamps.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -306,7 +300,7 @@ export class SolanaService {
     }
   }
 
-  async initializeProgram(wallet: any): Promise<string> {
+  async initializeProgram(): Promise<string> {
     if (!this.isInitialized || !this.program) {
       throw new Error('SolanaService not properly initialized');
     }

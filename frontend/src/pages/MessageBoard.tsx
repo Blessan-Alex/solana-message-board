@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MessageSquare, Users } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
 import { MessageForm } from '@/components/message/MessageForm';
 import { MessageList } from '@/components/message/MessageList';
 import { WalletButton } from '@/components/wallet/WalletButton';

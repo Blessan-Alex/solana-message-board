@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::sysvar::Sysvar;
 
 declare_id!("CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj");
 
@@ -17,6 +18,10 @@ pub mod solana_message_board {
         let message_account = &mut ctx.accounts.message;
         message_account.author = ctx.accounts.author.key();
         message_account.content = content;
+        
+        // Store the current Unix timestamp from the Solana Clock
+        let clock = Clock::get()?;
+        message_account.timestamp = clock.unix_timestamp;
 
         Ok(())
     }
@@ -30,7 +35,7 @@ pub struct PostMessage<'info> {
     #[account(
         init,
         payer = author,
-        space = 8 + 32 + 4 + MAX_CONTENT_LENGTH
+        space = 8 + 32 + 4 + MAX_CONTENT_LENGTH + 8 // +8 for timestamp (i64)
     )]
     pub message: Account<'info, MessageAccount>,
     #[account(mut)]
@@ -42,6 +47,7 @@ pub struct PostMessage<'info> {
 pub struct MessageAccount {
     pub author: Pubkey,
     pub content: String,
+    pub timestamp: i64, // Unix timestamp from Solana Clock
 }
 
 pub const MAX_CONTENT_LENGTH: usize = 280; // bytes, adjust as needed

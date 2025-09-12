@@ -11,18 +11,32 @@ export function formatPublicKey(publicKey: string | null, length: number = 8): s
 }
 
 export function formatTimestamp(timestamp: number): string {
-  if (!timestamp || timestamp <= 0) return 'Unknown time';
+  // Handle invalid timestamps
+  if (!timestamp || timestamp <= 0 || isNaN(timestamp)) {
+    return 'Unknown time';
+  }
   
   const date = new Date(timestamp);
   const now = new Date();
+  
+  // Check if the date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid time';
+  }
+  
   const diff = now.getTime() - date.getTime();
   
   // Handle future timestamps (shouldn't happen but just in case)
   if (diff < 0) return 'Just now';
   
-  if (diff < 60000) return 'Just now';
+  // Handle very recent messages
+  if (diff < 30000) return 'Just now'; // Less than 30 seconds
+  if (diff < 60000) return '30s ago';
+  if (diff < 120000) return '1m ago';
   if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 7200000) return '1h ago';
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  if (diff < 172800000) return '1d ago';
   if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
   
   // For older messages, show the actual date

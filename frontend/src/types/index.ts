@@ -11,6 +11,7 @@ export interface Message {
 export interface MessageAccount {
   author: PublicKey;
   content: string;
+  timestamp: number; // Unix timestamp stored on-chain
 }
 
 export interface WalletState {
