@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 export interface Message {
   author: PublicKey;
   content: string;
-  timestamp?: number;
+  timestamp?: number | null;
   accountAddress?: PublicKey;
 }
 

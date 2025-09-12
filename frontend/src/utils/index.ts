@@ -10,10 +10,10 @@ export function formatPublicKey(publicKey: string | null, length: number = 8): s
   return `${publicKey.slice(0, length)}...${publicKey.slice(-length)}`;
 }
 
-export function formatTimestamp(timestamp: number): string {
-  // Handle invalid timestamps
+export function formatTimestamp(timestamp: number | null): string {
+  // Handle invalid or null timestamps
   if (!timestamp || timestamp <= 0 || isNaN(timestamp)) {
-    return 'Unknown time';
+    return '';
   }
   
   const date = new Date(timestamp);
@@ -29,14 +29,21 @@ export function formatTimestamp(timestamp: number): string {
   // Handle future timestamps (shouldn't happen but just in case)
   if (diff < 0) return 'Just now';
   
-  // Handle very recent messages
-  if (diff < 30000) return 'Just now'; // Less than 30 seconds
-  if (diff < 60000) return '30s ago';
-  if (diff < 120000) return '1m ago';
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-  if (diff < 7200000) return '1h ago';
+  // Handle very recent messages with more granular timing
+  if (diff < 1000) return 'Just now'; // Less than 1 second
+  if (diff < 5000) return 'A few seconds ago'; // Less than 5 seconds
+  if (diff < 10000) return '10s ago';
+  if (diff < 30000) return '30s ago';
+  if (diff < 60000) return '1m ago';
+  if (diff < 120000) return '2m ago';
+  if (diff < 300000) return '5m ago'; // 5 minutes
+  if (diff < 600000) return '10m ago'; // 10 minutes
+  if (diff < 1800000) return '30m ago'; // 30 minutes
+  if (diff < 3600000) return '1h ago';
+  if (diff < 7200000) return '2h ago';
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
   if (diff < 172800000) return '1d ago';
+  if (diff < 259200000) return '2d ago'; // 2 days
   if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
   
   // For older messages, show the actual date

@@ -10,7 +10,7 @@ import { config, defaultSolanaConfig, fallbackSolanaConfig } from '@/config/env'
 
 // Import the actual generated IDL from Anchor
 const IDL = {
-  "address": config.programId,
+  "address": "CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj",
   "metadata": {
     "name": "solana_message_board",
     "version": "0.1.0",
@@ -104,6 +104,10 @@ const IDL = {
           {
             "name": "content",
             "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -255,28 +259,22 @@ export class SolanaService {
       const accounts = await (this.program.account as any).messageAccount.all() as any[];
       
       // Read timestamps directly from the on-chain account data
-      // Handle both old messages (without timestamp) and new messages (with timestamp)
+      // Only use real blockchain timestamps - no fallbacks
       const messagesWithTimestamps = accounts.map((account: any, index: number) => {
-        let timestamp: number;
+        // Only use timestamp if it exists and is valid
+        // Handle both BigNumber objects and regular numbers
+        let timestamp: number | null = null;
         
-        if (account.account.timestamp && account.account.timestamp > 0) {
-          // New messages: timestamp stored on-chain
-          timestamp = account.account.timestamp * 1000; // Convert Unix timestamp to milliseconds
-          console.log(`✅ New message with on-chain timestamp:`, {
-            account: account.publicKey.toString(),
-            onChainTimestamp: account.account.timestamp,
-            formatted: new Date(timestamp).toLocaleString()
-          });
-        } else {
-          // Old messages: use relative timing based on account order
-          const baseTime = Date.now();
-          timestamp = baseTime - (index * 2000); // Each old message is 2 seconds older
-          console.log(`⚠️ Old message with zero timestamp, using fallback:`, {
-            account: account.publicKey.toString(),
-            onChainTimestamp: account.account.timestamp,
-            fallbackTimestamp: timestamp,
-            formatted: new Date(timestamp).toLocaleString()
-          });
+        if (account.account.timestamp) {
+          // Convert BigNumber to number if it's a BigNumber object
+          const timestampValue = account.account.timestamp.toNumber ? 
+            account.account.timestamp.toNumber() : 
+            account.account.timestamp;
+          
+          // Check if it's a valid positive number
+          if (typeof timestampValue === 'number' && timestampValue > 0) {
+            timestamp = timestampValue * 1000; // Convert Unix timestamp to milliseconds
+          }
         }
         
         const messageData = {
