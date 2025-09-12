@@ -1,0 +1,19 @@
+[33mcommit c4bcfc1b26294a523c061a87e19e02a9c47a2613[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Blessan-Alex <blazeblessan123@gmail.com>
+Date:   Fri Sep 12 12:06:52 2025 +0000
+
+    chanages
+
+[1mdiff --git a/frontend/src/services/solanaService.ts b/frontend/src/services/solanaService.ts[m
+[1mindex c7ce16a..48297ee 100644[m
+[1m--- a/frontend/src/services/solanaService.ts[m
+[1m+++ b/frontend/src/services/solanaService.ts[m
+[36m@@ -9,7 +9,7 @@[m [mimport { SolanaConfig, Message, PostMessageParams } from '@/types';[m
+ import { defaultSolanaConfig, fallbackSolanaConfig } from '@/config/env';[m
+ [m
+ // Import the actual generated IDL from Anchor[m
+[31m-import IDL from '../../../../target/idl/solana_message_board.json';[m
+[32m+[m[32mimport IDL from '../../../target/idl/solana_message_board.json';[m
+ [m
+ export class SolanaService {[m
+   private connection!: Connection;[m
