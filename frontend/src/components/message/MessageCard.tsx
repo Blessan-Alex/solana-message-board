@@ -31,9 +31,19 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        duration: 0.6, 
+        delay: index * 0.1,
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }}
+      whileHover={{ 
+        y: -5,
+        transition: { duration: 0.2 }
+      }}
       className="mb-6"
     >
       <GlassCard className={`hover:shadow-lg transition-all duration-300 ${isOwnMessage ? 'ring-2 ring-primary-red/20' : ''}`}>
@@ -45,39 +55,39 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
             </div>
             
             <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-3 mb-1">
-                <h3 className="font-semibold text-black-pure text-lg font-heading">
-                  {formatPublicKey(message.author.toString())}
-                </h3>
-                {isOwnMessage && (
-                  <span className="bg-primary-red text-cream-light text-xs px-2 py-1 rounded-full font-medium">
-                    You
-                  </span>
-                )}
-              </div>
-              
-              {message.timestamp && (
-                <div className="flex items-center space-x-1 text-black-pure/60">
-                  <Clock className="w-3 h-3" />
-                  <span className="text-sm">
-                    {formatTimestamp(message.timestamp)}
-                  </span>
-                </div>
-              )}
+                     <div className="flex items-center space-x-3 mb-1">
+                       <h3 className="font-semibold text-cream-light text-lg font-heading">
+                         {formatPublicKey(message.author.toString())}
+                       </h3>
+                       {isOwnMessage && (
+                         <span className="bg-primary-red text-cream-light text-xs px-2 py-1 rounded-full font-medium">
+                           You
+                         </span>
+                       )}
+                     </div>
+
+                     {message.timestamp && (
+                       <div className="flex items-center space-x-1 text-beige-soft/70">
+                         <Clock className="w-3 h-3" />
+                         <span className="text-sm">
+                           {formatTimestamp(message.timestamp)}
+                         </span>
+                       </div>
+                     )}
             </div>
           </div>
 
           {/* Message content */}
           <div className="pl-16">
-            <p className="text-black-pure leading-relaxed whitespace-pre-wrap text-base">
+            <p className="text-cream-light leading-relaxed whitespace-pre-wrap text-base">
               {message.content}
             </p>
           </div>
 
           {/* Account address (for debugging) */}
           {message.accountAddress && (
-            <div className="pl-16 pt-3 border-t border-black-pure/10">
-              <div className="flex items-center space-x-2 text-black-pure/50">
+            <div className="pl-16 pt-3 border-t border-cream-light/10">
+              <div className="flex items-center space-x-2 text-beige-soft/50">
                 <User className="w-3 h-3" />
                 <span className="text-xs font-mono">
                   Account: {formatPublicKey(message.accountAddress.toString(), 4)}

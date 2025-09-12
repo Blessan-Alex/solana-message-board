@@ -12,11 +12,18 @@ interface MessageBoardProps {
 
 export const MessageBoard: React.FC<MessageBoardProps> = ({ onBackToLanding }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-beige-soft via-cream-light/50 to-beige-soft">
-      {/* Background elements */}
+    <div className="min-h-screen bg-gradient-to-br from-black-pure via-primary-red/10 to-black-pure">
+      {/* Dark tunnel background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-red/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cream-light/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-red/3 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-radial from-primary-red/2 via-transparent to-transparent rounded-full blur-2xl" />
+        
+        {/* Floating particles for tunnel effect */}
+        <div className="absolute top-20 left-10 w-1 h-1 bg-primary-red/40 rounded-full animate-pulse" />
+        <div className="absolute top-40 right-20 w-1.5 h-1.5 bg-cream-light/20 rounded-full animate-pulse delay-1000" />
+        <div className="absolute bottom-32 left-1/4 w-1 h-1 bg-beige-soft/30 rounded-full animate-pulse delay-2000" />
+        <div className="absolute top-60 right-1/3 w-0.5 h-0.5 bg-primary-red/50 rounded-full animate-pulse delay-3000" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
@@ -37,18 +44,45 @@ export const MessageBoard: React.FC<MessageBoardProps> = ({ onBackToLanding }) =
               <ArrowLeft className="w-4 h-4" />
               <span>Back</span>
             </GlassButton>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-primary-red to-cream-light rounded-2xl flex items-center justify-center shadow-lg">
-                <MessageSquare className="w-6 h-6 text-black-pure" />
-              </div>
+            <div className="flex items-center space-x-4">
+              {/* Enhanced Tunnel Logo */}
+              <motion.div 
+                className="relative w-16 h-16 bg-gradient-to-br from-primary-red via-primary-red/80 to-black-pure rounded-2xl flex items-center justify-center shadow-2xl ring-2 ring-cream-light/20"
+                whileHover={{ scale: 1.05, rotate: 2 }}
+                transition={{ duration: 0.2 }}
+              >
+                {/* Tunnel entrance effect */}
+                <div className="absolute inset-2 bg-gradient-to-br from-cream-light/20 to-transparent rounded-xl"></div>
+                
+                {/* Tunnel icon - stylized T */}
+                <div className="relative z-10 flex flex-col items-center justify-center">
+                  <div className="w-6 h-1 bg-cream-light rounded-full mb-1"></div>
+                  <div className="w-1 h-4 bg-cream-light rounded-full"></div>
+                  <div className="absolute -bottom-1 w-3 h-1 bg-primary-red/60 rounded-full"></div>
+                </div>
+                
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary-red/30 to-transparent rounded-2xl blur-sm"></div>
+              </motion.div>
+              
               <div>
-                <h1 className="text-2xl font-bold text-black-pure font-heading">
-                  Solana Message Board
-                </h1>
-                <p className="text-black-pure/60 text-sm flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  Decentralized community messages
-                </p>
+                <motion.h1 
+                  className="text-3xl font-bold text-cream-light font-heading tracking-tight"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  Tunnel
+                </motion.h1>
+                <motion.p 
+                  className="text-beige-soft/80 text-sm flex items-center font-medium"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  <Users className="w-4 h-4 mr-2 text-primary-red" />
+                  Your private space cut out from the real world
+                </motion.p>
               </div>
             </div>
           </div>

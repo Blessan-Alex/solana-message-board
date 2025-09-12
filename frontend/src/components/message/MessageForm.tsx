@@ -107,33 +107,39 @@ export const MessageForm: React.FC = () => {
 
   if (!connected) {
     return (
-      <GlassCard className="text-center py-8">
-        <AlertCircle className="w-12 h-12 text-primary-red mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-black-pure mb-2 font-heading">Connect Your Wallet</h3>
-        <p className="text-black-pure/70 text-sm">
-          Please connect your wallet to post messages to the Solana Message Board.
-        </p>
-      </GlassCard>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <GlassCard className="text-center py-8 bg-black-pure/20 border-cream-light/10">
+          <AlertCircle className="w-12 h-12 text-primary-red mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-cream-light mb-2 font-heading">Connect Your Wallet</h3>
+          <p className="text-beige-soft/70 text-sm">
+            Please connect your wallet to post messages to the Tunnel.
+          </p>
+        </GlassCard>
+      </motion.div>
     );
   }
 
   return (
-    <GlassCard>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="space-y-4"
-      >
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <GlassCard className="bg-black-pure/20 border-cream-light/10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-4"
+        >
         {/* Header */}
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-r from-primary-red to-cream-light rounded-xl flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-black-pure" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-black-pure font-heading">Post a Message</h2>
-            <p className="text-black-pure/60 text-sm">Share with the community</p>
-          </div>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-cream-light font-heading">Enter the Tunnel</h2>
+          <p className="text-beige-soft/70 text-sm">Share your thoughts in this private space</p>
         </div>
 
         {/* Error banner */}
@@ -164,11 +170,11 @@ export const MessageForm: React.FC = () => {
             
             {/* Character count */}
             <div className="flex justify-between items-center mt-2">
-              <span className="text-xs text-black-pure/50">
+              <span className="text-xs text-beige-soft/50">
                 {content.length > 200 ? `${content.length}/280` : 'Share your thoughts'}
               </span>
               {content.length > 200 && (
-                <span className={`text-xs ${content.length >= 280 ? 'text-primary-red' : 'text-black-pure/60'}`}>
+                <span className={`text-xs ${content.length >= 280 ? 'text-primary-red' : 'text-beige-soft/60'}`}>
                   {280 - content.length} characters left
                 </span>
               )}
@@ -185,7 +191,8 @@ export const MessageForm: React.FC = () => {
             <span>{loading ? 'Posting...' : 'Post Message'}</span>
           </GlassButton>
         </form>
-      </motion.div>
-    </GlassCard>
+        </motion.div>
+      </GlassCard>
+    </motion.div>
   );
 };

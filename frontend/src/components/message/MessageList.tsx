@@ -133,8 +133,8 @@ export const MessageList: React.FC = () => {
     <div className="space-y-6">
       {/* Header with refresh button */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-black-pure font-heading">
-          Community Messages ({messages.length})
+        <h2 className="text-2xl font-bold text-cream-light font-heading">
+          Tunnel Messages ({messages.length})
         </h2>
         <GlassButton
           onClick={fetchMessages}
@@ -155,7 +155,7 @@ export const MessageList: React.FC = () => {
         >
           <div className="flex items-center space-x-2">
             <AlertCircle className="w-5 h-5 text-primary-red" />
-            <span className="text-primary-red text-sm">{error}</span>
+            <span className="text-cream-light text-sm">{error}</span>
           </div>
         </motion.div>
       )}
