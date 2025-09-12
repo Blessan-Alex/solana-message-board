@@ -133,7 +133,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
           profile={profile}
           isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
-          isOwnProfile={isOwnMessage}
+          isOwnProfile={!!isOwnMessage}
         />,
         document.body
       )}
