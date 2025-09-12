@@ -1,16 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, Wallet } from 'lucide-react';
 import { MessageForm } from '@/components/message/MessageForm';
 import { MessageList } from '@/components/message/MessageList';
 import { WalletButton } from '@/components/wallet/WalletButton';
 import { GlassButton } from '@/components/ui/GlassButton';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { useWallet } from '@/hooks/useWallet';
 
 interface MessageBoardProps {
   onBackToLanding: () => void;
 }
 
 export const MessageBoard: React.FC<MessageBoardProps> = ({ onBackToLanding }) => {
+  const { connected } = useWallet();
   return (
     <div className="min-h-screen bg-gradient-to-br from-black-pure via-primary-red/10 to-black-pure">
       {/* Dark tunnel background elements */}
@@ -90,29 +93,66 @@ export const MessageBoard: React.FC<MessageBoardProps> = ({ onBackToLanding }) =
         </motion.header>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar - Message Form */}
+        {connected ? (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Sidebar - Message Form */}
+            <motion.div
+              className="lg:col-span-1"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="sticky top-8">
+                <MessageForm />
+              </div>
+            </motion.div>
+
+            {/* Main Feed - Messages */}
+            <motion.div
+              className="lg:col-span-3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <MessageList />
+            </motion.div>
+          </div>
+        ) : (
+          /* Wallet Not Connected State */
           <motion.div
-            className="lg:col-span-1"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            className="max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="sticky top-8">
-              <MessageForm />
-            </div>
+            <GlassCard className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <div className="w-20 h-20 bg-primary-red/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Wallet className="w-10 h-10 text-primary-red" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-cream-light mb-4 font-heading">Wallet Required</h3>
+                
+                <p className="text-beige-soft/80 text-lg leading-relaxed mb-8">
+                  You need to connect your wallet to access the Tunnel's message board. 
+                  This ensures secure access to the decentralized features.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <WalletButton />
+                  <GlassButton 
+                    onClick={onBackToLanding}
+                    variant="ghost"
+                    className="flex items-center space-x-2 px-6 py-3"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Back to Landing</span>
+                  </GlassButton>
+                </div>
+              </div>
+            </GlassCard>
           </motion.div>
-
-          {/* Main Feed - Messages */}
-          <motion.div
-            className="lg:col-span-3"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <MessageList />
-          </motion.div>
-        </div>
+        )}
       </div>
     </div>
   );

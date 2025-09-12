@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { RefreshCw, MessageCircle, AlertCircle } from 'lucide-react';
+import { RefreshCw, MessageCircle, AlertCircle, Wallet } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { MessageCard } from './MessageCard';
 import { useMessagesStore } from '@/stores/messagesStore';
 import { solanaService } from '@/services/solanaService';
+import { useWallet } from '@/hooks/useWallet';
 
 export const MessageList: React.FC = () => {
   const { messages, loading, error, setMessages, setLoading, setError } = useMessagesStore();
+  const { connected } = useWallet();
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -27,8 +29,25 @@ export const MessageList: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchMessages();
-  }, []);
+    if (connected) {
+      fetchMessages();
+    }
+  }, [connected]);
+
+  // Show wallet connection required message when not connected
+  if (!connected) {
+    return (
+      <GlassCard className="text-center py-12">
+        <div className="w-16 h-16 bg-primary-red/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Wallet className="w-8 h-8 text-primary-red" />
+        </div>
+        <h3 className="text-lg font-semibold text-cream-light mb-2 font-heading">Connect Your Wallet</h3>
+        <p className="text-beige-soft/80 mb-4">
+          Please connect your wallet to view messages from the Tunnel.
+        </p>
+      </GlassCard>
+    );
+  }
 
   if (loading && messages.length === 0) {
     return (
