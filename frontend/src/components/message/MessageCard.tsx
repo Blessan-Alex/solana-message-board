@@ -1,10 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Clock, User } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { formatPublicKey, formatTimestamp } from '@/utils';
 import { Message } from '@/types';
+import { useProfileStore } from '@/stores/profileStore';
+import { ProfileModal } from '@/components/profile/ProfileModal';
 
 interface MessageCardProps {
   message: Message;
@@ -13,7 +16,12 @@ interface MessageCardProps {
 
 export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
   const { publicKey } = useWallet();
+  const { getProfile } = useProfileStore();
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  
   const isOwnMessage = publicKey && message.author.equals(publicKey);
+  const authorAddress = message.author.toString();
+  const profile = getProfile(authorAddress);
   
   // Memoize avatar generation to prevent recalculation on every render
   const { avatarColor, initials } = useMemo(() => {
@@ -24,12 +32,16 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
       'from-primary-red/80 to-beige-soft/80',
       'from-cream-light/80 to-primary-red/80'
     ];
-    const avatarIndex = parseInt(message.author.toString().slice(-1), 16) % avatarColors.length;
+    const avatarIndex = parseInt(authorAddress.slice(-1), 16) % avatarColors.length;
     const avatarColor = avatarColors[avatarIndex];
-    const initials = message.author.toString().slice(0, 2).toUpperCase();
+    
+    // Use display name initials if available, otherwise use wallet address initials
+    const initials = profile?.displayName 
+      ? profile.displayName.slice(0, 2).toUpperCase()
+      : authorAddress.slice(0, 2).toUpperCase();
     
     return { avatarColor, initials };
-  }, [message.author]);
+  }, [authorAddress, profile?.displayName]);
 
   return (
     <motion.div
@@ -52,30 +64,45 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
         <div className="space-y-4">
           {/* Header with avatar and user info */}
           <div className="flex items-start space-x-4">
-            <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${avatarColor} flex items-center justify-center text-black-pure font-bold text-lg flex-shrink-0 shadow-md`}>
+            <motion.button
+              onClick={() => setShowProfileModal(true)}
+              className={`w-12 h-12 rounded-full bg-gradient-to-r ${avatarColor} flex items-center justify-center text-black-pure font-bold text-lg flex-shrink-0 shadow-md hover:scale-105 transition-transform cursor-pointer`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               {initials}
-            </div>
+            </motion.button>
             
             <div className="flex-1 min-w-0">
-                     <div className="flex items-center space-x-3 mb-1">
-                       <h3 className="font-semibold text-cream-light text-lg font-heading">
-                         {formatPublicKey(message.author.toString())}
-                       </h3>
-                       {isOwnMessage && (
-                         <span className="bg-primary-red text-cream-light text-xs px-2 py-1 rounded-full font-medium">
-                           You
-                         </span>
-                       )}
-                     </div>
+              <div className="flex items-center space-x-3 mb-1">
+                <h3 className="font-semibold text-cream-light text-lg font-heading">
+                  {profile?.displayName || formatPublicKey(authorAddress)}
+                </h3>
+                {isOwnMessage && (
+                  <span className="bg-primary-red text-cream-light text-xs px-2 py-1 rounded-full font-medium">
+                    You
+                  </span>
+                )}
+              </div>
 
-                     {message.timestamp && (
-                       <div className="flex items-center space-x-1 text-beige-soft/70">
-                         <Clock className="w-3 h-3" />
-                         <span className="text-sm">
-                           {formatTimestamp(message.timestamp)}
-                         </span>
-                       </div>
-                     )}
+              {/* Show wallet address if different from display name */}
+              {profile?.displayName && (
+                <div className="flex items-center space-x-1 text-beige-soft/50 mb-1">
+                  <User className="w-3 h-3" />
+                  <span className="text-xs font-mono">
+                    {formatPublicKey(authorAddress)}
+                  </span>
+                </div>
+              )}
+
+              {message.timestamp && (
+                <div className="flex items-center space-x-1 text-beige-soft/70">
+                  <Clock className="w-3 h-3" />
+                  <span className="text-sm">
+                    {formatTimestamp(message.timestamp)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -99,6 +126,17 @@ export const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
           )}
         </div>
       </GlassCard>
+
+      {/* Profile Modal - Rendered via Portal */}
+      {profile && showProfileModal && createPortal(
+        <ProfileModal
+          profile={profile}
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          isOwnProfile={isOwnMessage}
+        />,
+        document.body
+      )}
     </motion.div>
   );
 };

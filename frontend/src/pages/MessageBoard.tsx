@@ -1,19 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Users, Wallet } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ArrowLeft, Users, Wallet, User } from 'lucide-react';
 import { MessageForm } from '@/components/message/MessageForm';
 import { MessageList } from '@/components/message/MessageList';
 import { WalletButton } from '@/components/wallet/WalletButton';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { GlassCard } from '@/components/ui/GlassCard';
+import { ProfileModal } from '@/components/profile/ProfileModal';
+import { ProfileEdit } from '@/components/profile/ProfileEdit';
 import { useWallet } from '@/hooks/useWallet';
+import { useProfileStore } from '@/stores/profileStore';
 
 interface MessageBoardProps {
   onBackToLanding: () => void;
 }
 
 export const MessageBoard: React.FC<MessageBoardProps> = ({ onBackToLanding }) => {
-  const { connected } = useWallet();
+  const { connected, publicKey } = useWallet();
+  const { currentProfile } = useProfileStore();
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
   return (
     <div className="min-h-screen bg-gradient-to-br from-black-pure via-primary-red/10 to-black-pure">
       {/* Dark tunnel background elements */}
@@ -89,7 +96,20 @@ export const MessageBoard: React.FC<MessageBoardProps> = ({ onBackToLanding }) =
               </div>
             </div>
           </div>
-          <WalletButton />
+          <div className="flex items-center space-x-3">
+            {currentProfile && (
+              <GlassButton
+                onClick={() => setShowProfileModal(true)}
+                variant="ghost"
+                size="sm"
+                className="flex items-center space-x-2 text-cream-light hover:text-cream-light"
+              >
+                <User className="w-4 h-4 text-cream-light" />
+                <span className="text-cream-light">{currentProfile.displayName}</span>
+              </GlassButton>
+            )}
+            <WalletButton />
+          </div>
         </motion.header>
 
         {/* Main Content */}
@@ -154,6 +174,29 @@ export const MessageBoard: React.FC<MessageBoardProps> = ({ onBackToLanding }) =
           </motion.div>
         )}
       </div>
+
+      {/* Profile Modals - Rendered via Portal */}
+      {currentProfile && showProfileModal && createPortal(
+        <ProfileModal
+          profile={currentProfile}
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          onEdit={() => {
+            setShowProfileModal(false);
+            setShowProfileEdit(true);
+          }}
+          isOwnProfile={true}
+        />,
+        document.body
+      )}
+      
+      {showProfileEdit && createPortal(
+        <ProfileEdit
+          isOpen={showProfileEdit}
+          onClose={() => setShowProfileEdit(false)}
+        />,
+        document.body
+      )}
     </div>
   );
 };
