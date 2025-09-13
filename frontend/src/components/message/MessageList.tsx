@@ -182,7 +182,7 @@ export const MessageList: React.FC = () => {
       {/* Messages Feed */}
       <div className="space-y-4">
         {messages.map((message, index) => (
-          <MessageCard key={index} message={message} index={index} />
+          <MessageCard key={index} message={message} index={index} onRefresh={fetchMessages} />
         ))}
       </div>
     </div>

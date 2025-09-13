@@ -5,7 +5,7 @@ import {
   SystemProgram
 } from '@solana/web3.js';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
-import { SolanaConfig, Message, PostMessageParams } from '@/types';
+import { SolanaConfig, Message, PostMessageParams, LikeMessageParams, UnlikeMessageParams, EditMessageParams, DeleteMessageParams } from '@/types';
 import { defaultSolanaConfig, fallbackSolanaConfig } from '@/config/env';
 
 // Import the actual generated IDL from Anchor
@@ -18,12 +18,51 @@ export class SolanaService {
   private isInitialized = false;
 
   constructor(config: SolanaConfig) {
-    this.initializeService(config);
+    this.initializeServiceSync(config);
   }
 
+  private initializeServiceSync(config: SolanaConfig) {
+    try {
+      // Validate program ID
+      if (!config.programId || config.programId.trim() === '') {
+        throw new Error('Program ID is required but not provided');
+      }
+      
+      this.programId = new PublicKey(config.programId);
+      
+      // Use configured RPC URL
+      const rpcUrl = config.rpcUrl || 'https://api.devnet.solana.com';
+      if (!rpcUrl) {
+        throw new Error('RPC URL is required');
+      }
+      this.connection = new Connection(rpcUrl, 'confirmed');
+      
+      // Create a dummy wallet for the provider
+      const dummyWallet = {
+        publicKey: PublicKey.default,
+        signTransaction: async (tx: any) => tx,
+        signAllTransactions: async (txs: any[]) => txs,
+      };
+      const provider = new AnchorProvider(this.connection, dummyWallet as any, {});
+      
+      // Use the program ID from the IDL instead of config
+      this.program = new Program(IDL as any, provider);
+      this.isInitialized = true;
+      console.log('SolanaService initialized successfully with program ID:', this.programId.toString());
+    } catch (error) {
+      console.error('Failed to initialize SolanaService:', error);
+      this.isInitialized = false;
+      // Don't throw here, let the service handle initialization failures gracefully
+    }
+  }
 
   private async initializeService(config: SolanaConfig) {
     try {
+      // Validate program ID
+      if (!config.programId || config.programId.trim() === '') {
+        throw new Error('Program ID is required but not provided');
+      }
+      
       this.programId = new PublicKey(config.programId);
       
       // Use configured RPC URL
@@ -142,14 +181,9 @@ export class SolanaService {
   }
 
   async fetchMessages(): Promise<Message[]> {
-    // Wait for initialization if not ready yet
+    // Check if service is properly initialized
     if (!this.isInitialized || !this.program) {
-      // Since we're using devnet, try devnet directly
-      await this.initializeService(fallbackSolanaConfig);
-      
-      if (!this.isInitialized || !this.program) {
-        throw new Error('Failed to connect to Solana devnet. Please check your internet connection.');
-      }
+      throw new Error('SolanaService not properly initialized. Please refresh the page.');
     }
 
     console.log('🔄 Fetching messages from updated program with on-chain timestamps...');
@@ -191,13 +225,20 @@ export class SolanaService {
           content: account.account.content,
           accountAddress: account.publicKey,
           timestamp: timestamp,
+          likes: account.account.likes || 0,
+          likedBy: account.account.likedBy || [],
+          isDeleted: account.account.isDeleted || false,
+          editCount: account.account.editCount || 0,
+          lastEdited: account.account.lastEdited || null,
         };
         
         return messageData;
       });
       
-      // Sort messages by timestamp (newest first)
-      return messagesWithTimestamps.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      // Filter out deleted messages and sort by timestamp (newest first)
+      return messagesWithTimestamps
+        .filter(message => !message.isDeleted)
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     } catch (error) {
       console.error('Error fetching messages:', error);
       if (error instanceof Error && error.message.includes('Failed to fetch')) {
@@ -234,6 +275,186 @@ export class SolanaService {
 
   getProgramId(): PublicKey {
     return this.programId;
+  }
+
+  async likeMessage(params: LikeMessageParams, wallet: any, publicKey: any): Promise<string> {
+    if (!this.isInitialized || !this.program) {
+      throw new Error('SolanaService not properly initialized');
+    }
+
+    if (!publicKey) {
+      throw new Error('Public key not available');
+    }
+
+    try {
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+      
+      const tx = await this.program.methods
+        .likeMessage()
+        .accounts({
+          message: params.messageAccount,
+          user: publicKey,
+        })
+        .transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = publicKey;
+
+      let signedTx;
+      if (wallet && wallet.signTransaction) {
+        signedTx = await wallet.signTransaction(tx);
+      } else if (window.solana && window.solana.signTransaction) {
+        signedTx = await window.solana.signTransaction(tx);
+      } else {
+        throw new Error('No signing method available');
+      }
+
+      const signature = await this.connection.sendRawTransaction(signedTx.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+      });
+
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      return signature;
+    } catch (error) {
+      console.error('Error liking message:', error);
+      throw new Error(`Failed to like message: ${error}`);
+    }
+  }
+
+  async unlikeMessage(params: UnlikeMessageParams, wallet: any, publicKey: any): Promise<string> {
+    if (!this.isInitialized || !this.program) {
+      throw new Error('SolanaService not properly initialized');
+    }
+
+    if (!publicKey) {
+      throw new Error('Public key not available');
+    }
+
+    try {
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+      
+      const tx = await this.program.methods
+        .unlikeMessage()
+        .accounts({
+          message: params.messageAccount,
+          user: publicKey,
+        })
+        .transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = publicKey;
+
+      let signedTx;
+      if (wallet && wallet.signTransaction) {
+        signedTx = await wallet.signTransaction(tx);
+      } else if (window.solana && window.solana.signTransaction) {
+        signedTx = await window.solana.signTransaction(tx);
+      } else {
+        throw new Error('No signing method available');
+      }
+
+      const signature = await this.connection.sendRawTransaction(signedTx.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+      });
+
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      return signature;
+    } catch (error) {
+      console.error('Error unliking message:', error);
+      throw new Error(`Failed to unlike message: ${error}`);
+    }
+  }
+
+  async editMessage(params: EditMessageParams, wallet: any, publicKey: any): Promise<string> {
+    if (!this.isInitialized || !this.program) {
+      throw new Error('SolanaService not properly initialized');
+    }
+
+    if (!publicKey) {
+      throw new Error('Public key not available');
+    }
+
+    try {
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+      
+      const tx = await this.program.methods
+        .editMessage(params.newContent)
+        .accounts({
+          message: params.messageAccount,
+          author: publicKey,
+        })
+        .transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = publicKey;
+
+      let signedTx;
+      if (wallet && wallet.signTransaction) {
+        signedTx = await wallet.signTransaction(tx);
+      } else if (window.solana && window.solana.signTransaction) {
+        signedTx = await window.solana.signTransaction(tx);
+      } else {
+        throw new Error('No signing method available');
+      }
+
+      const signature = await this.connection.sendRawTransaction(signedTx.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+      });
+
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      return signature;
+    } catch (error) {
+      console.error('Error editing message:', error);
+      throw new Error(`Failed to edit message: ${error}`);
+    }
+  }
+
+  async deleteMessage(params: DeleteMessageParams, wallet: any, publicKey: any): Promise<string> {
+    if (!this.isInitialized || !this.program) {
+      throw new Error('SolanaService not properly initialized');
+    }
+
+    if (!publicKey) {
+      throw new Error('Public key not available');
+    }
+
+    try {
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+      
+      const tx = await this.program.methods
+        .deleteMessage()
+        .accounts({
+          message: params.messageAccount,
+          author: publicKey,
+        })
+        .transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = publicKey;
+
+      let signedTx;
+      if (wallet && wallet.signTransaction) {
+        signedTx = await wallet.signTransaction(tx);
+      } else if (window.solana && window.solana.signTransaction) {
+        signedTx = await window.solana.signTransaction(tx);
+      } else {
+        throw new Error('No signing method available');
+      }
+
+      const signature = await this.connection.sendRawTransaction(signedTx.serialize(), {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+      });
+
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      return signature;
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      throw new Error(`Failed to delete message: ${error}`);
+    }
   }
 
   isReady(): boolean {

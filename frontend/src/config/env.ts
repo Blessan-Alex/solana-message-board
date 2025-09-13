@@ -12,7 +12,7 @@ export interface AppConfig {
 // Default configuration (fallback values) - these should be overridden by environment variables
 const defaultConfig: AppConfig = {
   network: 'devnet',
-  programId: '', // Must be set via environment variable
+  programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj', // Default program ID
   rpcUrl: 'https://api.devnet.solana.com',
 };
 
@@ -26,27 +26,16 @@ export function getConfig(): AppConfig {
   const envProgramId = (import.meta as any).env?.VITE_PROGRAM_ID as string;
   const envRpcUrl = (import.meta as any).env?.VITE_RPC_URL as string;
 
-  // Validate required environment variables
-  if (!envProgramId) {
-    throw new Error(
-      'VITE_PROGRAM_ID environment variable is required. Please create a .env file with your program ID.'
-    );
-  }
+  // Use environment variables if available, otherwise use defaults
+  const programId = envProgramId || defaultConfig.programId;
+  const network = envNetwork || defaultConfig.network;
+  const rpcUrl = envRpcUrl || defaultConfig.rpcUrl;
 
-  // If environment variables are available, use them
-  if (envNetwork && envProgramId && envRpcUrl) {
-    return {
-      network: envNetwork as 'localnet' | 'devnet' | 'mainnet-beta',
-      programId: envProgramId,
-      rpcUrl: envRpcUrl,
-    };
-  }
-
-  // Fallback to default with environment program ID
+  // Return configuration with environment variables or defaults
   return {
-    ...defaultConfig,
-    programId: envProgramId || '',
-    rpcUrl: envRpcUrl || defaultConfig.rpcUrl,
+    network: network as 'localnet' | 'devnet' | 'mainnet-beta',
+    programId: programId,
+    rpcUrl: rpcUrl,
   };
 }
 
@@ -62,6 +51,6 @@ export const defaultSolanaConfig = {
 
 export const fallbackSolanaConfig = {
   network: 'devnet' as const,
-  programId: '', // Must be set via environment variable
+  programId: 'CTo9zyKZRzHmQT7TvogQ6r8Z7AMd8asTf8AMyBAJFcUj', // Default program ID
   rpcUrl: 'https://api.devnet.solana.com',
 };

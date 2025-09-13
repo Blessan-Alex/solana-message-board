@@ -11,9 +11,19 @@ import './App.css';
 
 // Inner component that has access to wallet context
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<'landing' | 'login' | 'profileSetup' | 'messageBoard'>('landing');
+  // Initialize state from localStorage to persist across refreshes
+  const [currentPage, setCurrentPage] = useState<'landing' | 'login' | 'profileSetup' | 'messageBoard'>(() => {
+    const savedPage = localStorage.getItem('currentPage') as 'landing' | 'login' | 'profileSetup' | 'messageBoard';
+    return savedPage || 'landing';
+  });
+  
   const { connected, publicKey } = useWallet();
   const { hasProfile, setCurrentProfile } = useProfileStore();
+
+  // Save current page to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('currentPage', currentPage);
+  }, [currentPage]);
 
   // Handle wallet connection and profile setup
   useEffect(() => {
@@ -22,12 +32,21 @@ function AppContent() {
       
       // Check if user has a profile set up
       if (hasProfile(publicKey.toString())) {
-        setCurrentPage('messageBoard');
+        // Only redirect to messageBoard if we're not already there or if we're on landing/login
+        if (currentPage === 'landing' || currentPage === 'login') {
+          setCurrentPage('messageBoard');
+        }
       } else {
-        setCurrentPage('profileSetup');
+        // Only redirect to profileSetup if we're not already there or if we're on landing/login
+        if (currentPage === 'landing' || currentPage === 'login') {
+          setCurrentPage('profileSetup');
+        }
       }
+    } else if (!connected && (currentPage === 'messageBoard' || currentPage === 'profileSetup')) {
+      // If wallet disconnects while in chat, go back to login
+      setCurrentPage('login');
     }
-  }, [connected, publicKey, hasProfile, setCurrentProfile]);
+  }, [connected, publicKey, hasProfile, setCurrentProfile, currentPage]);
 
   const handleEnterApp = () => {
     setCurrentPage('login');

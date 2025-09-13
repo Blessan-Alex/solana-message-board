@@ -6,12 +6,22 @@ export interface Message {
   content: string;
   timestamp?: number | null;
   accountAddress?: PublicKey;
+  likes?: number;
+  likedBy?: PublicKey[];
+  isDeleted?: boolean;
+  editCount?: number;
+  lastEdited?: number | null;
 }
 
 export interface MessageAccount {
   author: PublicKey;
   content: string;
   timestamp: number; // Unix timestamp stored on-chain
+  likes: number;
+  likedBy: PublicKey[];
+  isDeleted: boolean;
+  editCount: number;
+  lastEdited: number | null;
 }
 
 export interface WalletState {
@@ -46,6 +56,27 @@ export interface ProgramAccounts {
 
 export interface PostMessageParams {
   content: string;
+  author: PublicKey;
+}
+
+export interface LikeMessageParams {
+  messageAccount: PublicKey;
+  user: PublicKey;
+}
+
+export interface UnlikeMessageParams {
+  messageAccount: PublicKey;
+  user: PublicKey;
+}
+
+export interface EditMessageParams {
+  messageAccount: PublicKey;
+  author: PublicKey;
+  newContent: string;
+}
+
+export interface DeleteMessageParams {
+  messageAccount: PublicKey;
   author: PublicKey;
 }
 

@@ -43,7 +43,6 @@ export const WalletContextProvider: React.FC<WalletContextProviderProps> = ({ ch
         }}
       >
         <WalletModalProvider 
-          featuredWallets={[PhantomWalletAdapter.name]}
           className="wallet-modal-wrapper"
         >
           {children}
