@@ -1,0 +1,92 @@
+/* Custom wallet modal styling to highlight Phantom wallet */
+
+.wallet-modal-wrapper .wallet-adapter-modal-wrapper {
+  background: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(245, 245, 220, 0.1)) !important;
+  border: 2px solid rgba(220, 38, 38, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-title {
+  color: #f5f5dc !important;
+  font-weight: bold !important;
+}
+
+/* Highlight Phantom wallet specifically */
+.wallet-modal-wrapper .wallet-adapter-modal-list .wallet-adapter-modal-list-item:first-child {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(245, 245, 220, 0.1)) !important;
+  border: 2px solid rgba(220, 38, 38, 0.4) !important;
+  border-radius: 12px !important;
+  margin-bottom: 8px !important;
+  position: relative !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-list .wallet-adapter-modal-list-item:first-child::before {
+  content: "⭐ Recommended" !important;
+  position: absolute !important;
+  top: -8px !important;
+  right: 8px !important;
+  background: rgba(220, 38, 38, 0.9) !important;
+  color: #f5f5dc !important;
+  padding: 2px 8px !important;
+  border-radius: 12px !important;
+  font-size: 10px !important;
+  font-weight: bold !important;
+  z-index: 10 !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-list .wallet-adapter-modal-list-item:first-child .wallet-adapter-modal-list-item-name {
+  color: #f5f5dc !important;
+  font-weight: bold !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-list .wallet-adapter-modal-list-item:first-child .wallet-adapter-modal-list-item-icon {
+  filter: brightness(1.2) !important;
+}
+
+/* Style other wallet items */
+.wallet-modal-wrapper .wallet-adapter-modal-list .wallet-adapter-modal-list-item {
+  background: rgba(245, 245, 220, 0.05) !important;
+  border: 1px solid rgba(245, 245, 220, 0.2) !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-list .wallet-adapter-modal-list-item:hover {
+  background: rgba(245, 245, 220, 0.1) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-list .wallet-adapter-modal-list-item-name {
+  color: #f5f5dc !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-button {
+  background: linear-gradient(135deg, #dc2626, #dc2626cc) !important;
+  border: 1px solid rgba(220, 38, 38, 0.5) !important;
+  color: #f5f5dc !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-button:hover {
+  background: linear-gradient(135deg, #dc2626cc, #dc262699) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-button-close {
+  color: #f5f5dc !important;
+}
+
+.wallet-modal-wrapper .wallet-adapter-modal-button-close:hover {
+  color: #dc2626 !important;
+}

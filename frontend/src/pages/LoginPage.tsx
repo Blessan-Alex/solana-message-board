@@ -195,10 +195,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onBackToLa
                 <Wallet className="w-6 h-6 text-primary-red" />
               </div>
               <p className="text-beige-soft leading-relaxed mb-4">
-                Currently, only <span className="text-primary-red font-semibold">Phantom Wallet</span> is supported.
+                <span className="text-primary-red font-semibold">Phantom Wallet</span> is recommended for the best experience.
               </p>
               <p className="text-beige-soft/80 text-sm">
-                More wallet options will be added in future updates.
+                Other supported wallets: Solflare, Torus, Ledger, MathWallet
               </p>
             </GlassCard>
           </motion.div>
